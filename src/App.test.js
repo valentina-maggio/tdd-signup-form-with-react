@@ -1,41 +1,59 @@
-import { render, screen } from '@testing-library/react';
+import { getDefaultNormalizer, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
-test('inputs should be initially empty', () => {
+beforeEach(() => {
+  console.log('this will run before each test');
   render(<App />);
+});
+
+const typeIntoForm = ({ email, password, confirmPassword }) => {
+  const emailInputElement = screen.getByRole('textbox', { name: /email/i });
+  const passwordInputElement = screen.getByLabelText('Password');
+  const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i);
+  if (email) {
+    userEvent.type(emailInputElement, email);
+  } 
+  if (password) {
+    userEvent.type(passwordInputElement, password);
+  } 
+  if (confirmPassword) {
+    userEvent.type(confirmPasswordInputElement, confirmPassword);
+  }
+
+  return {
+    emailInputElement,
+    passwordInputElement,
+    confirmPasswordInputElement
+  }
+}
+
+test('inputs should be initially empty', () => {
   const emailInputElement = screen.getByRole('textbox');
   const passwordInputElement = screen.getByLabelText('Password'); 
-  const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i); // use of regex for the psw label (i for case insensitive)
-  expect(emailInputElement.value).toBe('');
+  const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i); 
   expect(passwordInputElement.value).toBe('');
   expect(confirmPasswordInputElement.value).toBe('');
 });
 
 test('should be able to type an email', () => {
-  render(<App />);
-  const emailInputElement = screen.getByRole('textbox', { name: /email/i });
-  // trying to simulate browser interaction into our app by using library/user-event:
-  userEvent.type(emailInputElement, 'valentina@gmail.com');
+  const {emailInputElement} = typeIntoForm({ email: 'valentina@gmail.com' });
   expect(emailInputElement.value).toBe('valentina@gmail.com');
 });
 
 test('should be able to type a password', () => {
-  render(<App />);
   const passwordInputElement = screen.getByLabelText('Password');
   userEvent.type(passwordInputElement, 'mypassword');
   expect(passwordInputElement.value).toBe('mypassword');
 });
 
 test('should be able to type a confirm password', () => {
-  render(<App />);
   const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i);
   userEvent.type(confirmPasswordInputElement, 'mypassword');
   expect(confirmPasswordInputElement.value).toBe('mypassword');
 });
 
 test('should show email error message on invalid email', () => {
-  render(<App />);
   const emailErrorElement = screen.queryByText(/the email you input is invalid/i);
   const emailInputElement = screen.getByRole('textbox', { name: /email/i });
   const submitBtnElement = screen.getByRole('button', { name: /submit/i });
@@ -51,7 +69,6 @@ test('should show email error message on invalid email', () => {
 });
 
 test('should show password error if password is less than 5 characters', () => {
-  render(<App />);
   const passwordErrorElement = screen.queryByText(/the password you entered should contain 5 or more characters/i);
   const emailInputElement = screen.getByRole('textbox', { name: /email/i });
   const passwordInputElement = screen.getByLabelText('Password');
@@ -68,7 +85,6 @@ test('should show password error if password is less than 5 characters', () => {
 });
 
 test('should show confirm password error message if passwords don\'t match', () => {
-  render(<App />);
   const confirmPasswordErrorElement = screen.queryByText(/the passwords don't match. try again/i);
   const emailInputElement = screen.getByRole('textbox', { name: /email/i });
   const passwordInputElement = screen.getByLabelText('Password');
@@ -90,7 +106,6 @@ test('should show confirm password error message if passwords don\'t match', () 
 });
 
 test('should show no error message if every input is valid', () => {
-  render(<App />);
   const emailInputElement = screen.getByRole('textbox', { name: /email/i });
   const passwordInputElement = screen.getByLabelText('Password');
   const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i);
