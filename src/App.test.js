@@ -48,4 +48,21 @@ test('should show email error message on invalid email', () => {
   const emailErrorElementAgain = screen.queryByText(/the email you input is invalid/i);
 
   expect(emailErrorElementAgain).toBeInTheDocument()
-})
+});
+
+test('should show password error if password is less than 5 characters', () => {
+  render(<App />);
+  const passwordErrorElement = screen.queryByText(/the password you entered should contain 5 or more characters/i);
+  const emailInputElement = screen.getByRole('textbox', { name: /email/i });
+  const passwordInputElement = screen.getByLabelText('Password');
+  const submitBtnElement = screen.getByRole('button', { name: /submit/i });
+
+  userEvent.type(emailInputElement, 'valentina@gmail.com');
+  expect(passwordErrorElement).not.toBeInTheDocument();
+  userEvent.type(passwordInputElement, 'psw');
+  userEvent.click(submitBtnElement);
+
+  const passwordErrorElementAgain = screen.queryByText(/the password you entered should contain 5 or more characters/i);
+
+  expect(passwordErrorElementAgain).toBeInTheDocument()
+});
