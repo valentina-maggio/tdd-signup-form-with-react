@@ -29,7 +29,7 @@ function App() {
         'The password you entered should contain 5 or more characters.');
     } else if (signupInput.password !== signupInput.confirmPassword) {
       return setError(
-        'The passwords don\'t match. Try again');
+        'The passwords don\'t match. Try again.');
       }
     }
 
